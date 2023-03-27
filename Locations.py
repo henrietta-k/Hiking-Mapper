@@ -1,5 +1,9 @@
+"""
+Using Djikstra's Algorithm to calculate the shortest hiking trail
+"""
+
 from Queue import*
-import pandas as pd
+from utils import*
 
 
 def construct_path(start, end, all_locs):
@@ -12,58 +16,62 @@ def construct_path(start, end, all_locs):
         end(str): the name of the location to end at
         all_locs(Directory): Directory object with all the Locations
 
-    Returns (List): a list of Location names
+    Returns (lst of lsts): a list of an float for the total path distance
+        and a list of Location names
     """
 
     dijkstra(start, end, all_locs)
 
-    result = []
+    path = []
     current = all_locs.directory[end]
 
     while start != current.name:
-        result.append(current.name)
+        path.append(current.name)
         current = current.previous
 
-    result.append(start)
-    result = result[::-1]
-    result.append(end)
+    path.append(start)
+    path = path[::-1]
+
+    result = [all_locs.directory[end].distance, path]
 
     return result
 
 
-def dijkstra(start, end, all_locs):
+def dijkstra(start, end, locs):
     """
     Implementing Dijkstra's shortest path algorithm
 
     Input:
         start(str): name of the location to start at
         end(str): the name of the location to end at
-        all_locs(Directory): Directory object with all the Locations
+        locs(Directory): Directory object with all the Locations
 
     Returns: (does not return a value)
     """
 
-    #EDIT THIS CODE HERE
-
     visited = set()
     stack = Queue()
 
+    start_loc = locs.directory[start]
+
     visited.add(start)
     stack.insert((0, start))
-    all_locs[start].distance = 0
+    start_loc.distance = 0
 
-    current = start
     while not stack.is_empty():
-        current = stack.pop_min()[1].name
-        visited.add(current)
-        if current == end:
+        current_name = stack.pop_min()[1]
+        visited.add(current_name)
+        if current_name == end:
             return
-        for neighbor in all_locs[current].neighbors:
-            dist = all_locs[current].neighbor[0] + all_locs[current].distance
-            if (neighbor[1] not in visited
-                    and dist < all_locs[neighbor[1]].distance):
-                current = neighbor[1]
-                stack.insert((neighbor[0], neighbor[1]))
+        current_loc = locs.directory[current_name]
+        for neighbor, neigh_dist in current_loc.neighbors.items():
+            dist = neigh_dist + current_loc.distance
+            if (neighbor not in visited
+                    and dist < locs.directory[neighbor].distance):
+                locs.directory[neighbor].previous = current_loc
+                current_name = neighbor
+                locs.directory[neighbor].distance = dist
+                stack.insert((dist, neighbor))
 
 
 class Location:
@@ -77,7 +85,7 @@ class Location:
         self.name = name
         self.previous = None
         self.distance = float("inf")
-        self.neighbors = []
+        self.neighbors = {}
 
 
     def change_distance(self, dist):
@@ -107,8 +115,11 @@ class Location:
         neighbors_lst = neighbors.split(", ")
         distances_lst = distances.split(", ")
 
+        for distance in distances_lst:
+            distance = float(distance)
+
         for i, neighbor in enumerate(neighbors_lst):
-            self.neighbors.append((neighbor, distances_lst[i]))
+            self.neighbors[neighbor] = float(distances_lst[i])
 
 
 class Directory:
@@ -116,46 +127,44 @@ class Directory:
     Class for keeping track of all Locations added
     """
 
-    def __init__(self, filename):
+    def __init__(self):
         """
         Constructor for a directory of all hiking Location objects
         """
 
-        self.file = filename
         self.directory = {}
+        self.add_locations()
 
 
     def add_locations(self):
         """
-        Adds all of the locaitons into self.directory
+        Adds all of the locations into self.directory
 
         Input: none
 
         Returns: (does not return a value)
         """
 
-        col_types = {"Name": str, "Neighbors": str, "Distances": str}
-        all_locs = pd.read_csv(self.file, dtype=col_types)
-        names_lst = all_locs["Name"].tolist()
-        neighbors = all_locs["Neighbors"].tolist()
-        distances = all_locs["Distances"].tolist()
-
-        for i, name in enumerate(names_lst):
+        for loc in locations:
+            name = loc["Name"]
+            neighbors = loc["Neighbors"]
+            distances = loc["Distances"]
             self.directory[name] = Location(name)
-            self.directory[name].add_neighbors(neighbors[i], distances[i])
+            self.directory[name].add_neighbors(neighbors, distances)
 
 
 #Driver Code
-print("Here are all possible locations choose from: ")
-all_locs = Directory("hiking_locations.csv")
+print("Welcome to the hiking trail planner!")
+print("Here are all possible locations choose from: \n")
+locs = Directory()
 counter = 0
-for name in all_locs.directory:
+for name in locs.directory:
     counter += 1
     print("{}. {}".format(counter, name))
-start = input("What location would you like to start at? ")
-end = input("What location would you like to end at?")
-path = construct_path(start, end, all_locs)
-print("Here is your constructed path: ")
-for loc in path:
-    print(loc)
-
+start = input("\nWhat location would you like to start at? ")
+end = input("What location would you like to end at? ")
+path = construct_path(start, end, locs)
+print("\nHere is your constructed path: ")
+for loc in path[1]:
+    print("- ", loc)
+print("\nHere is the total distance: {}km\n".format(path[0]))

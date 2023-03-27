@@ -42,7 +42,8 @@ class Queue:
         Checks the order of the items in the priority queue. If elements are not
         in order, it swaps the elements around.
 
-        Parameters: none
+        Inputs:
+            item(tuple): tuple of the priority of the item and the item itself
         Returns: (does not return a value)
         """
 
@@ -52,21 +53,14 @@ class Queue:
                 self.queue[i], self.queue[item_idx] = self.queue[item_idx], self.queue[i]
 
 
-    def change_priority(self, item):
-        """
-        Maybe don't need this function after all
-        """
-
-
     def pop_min(self):
         """
+        Removes and returns the item with the highest priority in the Queue
 
+        Inputs: None
         Returns (tuple): returns the item in the Queue of the highest priority
         """
-
         min_item = self.queue.pop(0)
-
         return min_item
-
 
 
