@@ -1,3 +1,10 @@
-# Hiking-Mapper
+# Hong Kong Hiking-Mapper
+This program asks the user to input the names of two hiking destinations in Hong kong, one to start at and one to end at. It outputs the length of the shortest route to get between those two destinations and any sightseeing spots in between them. The solver uses Dijkstra's algorithm to compute the shortest path. 
 
-![hiking-graphic](https://github.com/henrietta-k/Hiking-Mapper/assets/111554249/4ab41ea8-2aa6-4bf9-a31b-d1ff0c072ab1)
+## Usage
+<img width="324" alt="image" src="https://github.com/henrietta-k/Hiking-Mapper/assets/111554249/badc7a93-ce85-4f25-9898-edc5d2a3f87b">
+<img width="413" alt="image" src="https://github.com/henrietta-k/Hiking-Mapper/assets/111554249/bc67bdf1-0da1-4cb7-920b-29eacc1ba3a1">
+
+## Map
+![hiking map](https://github.com/henrietta-k/Hiking-Mapper/assets/111554249/bda37ad2-34f6-4033-8f06-05dbae78a962)
+
